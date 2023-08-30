@@ -1,0 +1,19 @@
+# Sample Authors
+# Remove file or replace with your own
+
+Cornelius Fiddlebone:
+  name: Cornelius Fiddlebone
+  picture: /images/bio-photo.jpg
+  twitter: corneliusfiddlebone
+
+홍동:
+  name: 홍동
+  picture: /assets/images/hd-avatar.png
+  twitter: "@HD__1994"
+  links:
+    - title: Twitter
+      url: https://twitter.com/HD__1994
+      icon: fab fa-twitter-square
+    - title: Github
+      url: https://github.com/nlom0218
+      icon: fab fa-github-square
