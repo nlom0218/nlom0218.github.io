@@ -18,8 +18,8 @@ remote_theme: mmistakes/so-simple-theme
 skin: "/assets/css/skins/default.css"
 locale: ko-KR
 title: "초부득삼"
-description: "It really is the best."
-baseurl: "/"
+description: Hello 🙋🏻‍♂️ I'm Frontend Engineer
+# baseurl: "/"
 url: "https://nlom0218.github.io"
 logo: # path of site logo, e.g. "/images/logo.png"
 date_format: "%Y-%m-%d"
@@ -36,9 +36,9 @@ google_fonts:
     weights: "400,400i,700,700i"
 google_analytics: # Google Analytics id, e.g. "UA-NNNNNNNN-N"
 disqus:
-  shortname: disqus_fVp2xIpIJl
+  shortname: "disqus_fVp2xIpIJl"
 twitter:
-  username: # site's Twitter username, e.g. "mmistakes"
+  username: "@HD__1994"
 
 # Liquid
 liquid:
