@@ -2,6 +2,7 @@
 title: "웹팩으로 리액트 시작하기 4 - dev, prod 환경 분리하기"
 categories:
   - 프로그래밍
+  - webpack
 tags:
   - Webpack with React
 image:
