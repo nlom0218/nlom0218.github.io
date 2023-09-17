@@ -1,3 +1,9 @@
+# 서버 실행하기
+
+```bash
+$ bundle exec jekyll serve
+```
+
 # [So Simple Jekyll Theme][1]
 
 [![LICENSE](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat-square)](https://raw.githubusercontent.com/mmistakes/so-simple-theme/master/LICENSE)
