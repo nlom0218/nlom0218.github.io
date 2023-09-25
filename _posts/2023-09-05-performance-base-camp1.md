@@ -4,6 +4,7 @@ categories:
   - 프로그래밍
   - 성능
 tags:
+  - 우아한테크코스
   - 프론트엔드 성능 베이스캠프
 image:
   thumbnail: /assets/images/thumbnail/performance.jpg
@@ -204,4 +205,266 @@ module.exports = {
 
 <img src="/assets/images/performance/hero-intrinsic-size.png">
 
-`Intrinsic size`을 살펴보면 hero 이미지의 원본 사이즈를 확인할 수 있다. 하지만 `4100 x 2735 px` 만큼 필요하지 않다.
+`Intrinsic size`을 살펴보면 hero 이미지의 원본 사이즈(해상도)를 확인할 수 있다. 하지만 `4100 x 2735 px` 만큼 필요하지 않다.
+
+때문에 해상도를 줄이기 위해 다음의 사이트를 이용하였다.
+
+[resizepixel](https://www.resizepixel.com/ko?status=1)
+
+이미지 비율을 그대로 두고 사이즈를 `2000 x 1333px`으로 줄였다. 결과는 다음과 같다.
+
+<img src="/assets/images/performance/change-hero-intrinsic-size.png">
+
+벌써 이미지 사이즈가 확 줄어든 것을 확인할 수 있다.
+
+## 2-3. png보단 jpg
+
+format을 변경하여 이미지 사이즈를 더 줄여보자. jpg이 png와 비교했을 때 용량이 훨씬 작고 사진과 같은 색상이 많은 이미지에 어울린다.
+
+이번에도 유용한 사이트의 도움을 받아 쉽게 변경할 수 있다.
+
+[PNG to JPG](https://png2jpg.com/ko/)
+
+결과는 다음과 같다.
+
+<img src="/assets/images/performance/convert-format-hero-image.png">
+
+이처럼 이미지의 원본 사이즈를 줄이고 format만 변경하여도 이미지 크기는 많이 줄어든다.
+
+|      기준      | 이미즈 크기 |
+| :------------: | :---------: |
+|      원본      |   10.7MB    |
+| 해상도 낮춘 후 |    2.4MB    |
+| format 변경 후 |    219kM    |
+
+## 2-4. 이미지를 webp로 변한하기
+
+앞선 과정을 통해 이미지크기가 많이 줄어들었다. 하지만 요구사항(120kB미만)은 아직 충족시키지 못하였다. 이를 webp를 활용하여 해결해보자.
+
+`web`이미지를 사용한다면 일반적으로 파일 크기가 25~35% 감소한다. 명령어를 활용하여 jpg형태의 이미지를 webp이미지로 변경해보자.
+
+먼저 기본적인 명령어 사용방법은 다음과 같다.
+
+```bash
+$ cwebp -q {품질(0~100)} {원본 파일 경로} -o {변경될 webp 파일 경로}
+```
+
+다음은 실제로 프로젝트에서 사용한 명령어이다.
+
+```bash
+$ cwebp -q 40 src/assets/images/hero.jpg -o src/assets/images/hero.webp
+```
+
+webp로 변환하여 이미지 크기를 확인한 결과 109kB로 줄어든 것을 확인할 수 있다.
+
+<img src="/assets/images/performance/convert-hero-webp.png">
+
+다음으로 webp롤 사용하여 이미지를 화면에 띄어보자. 이를 위해 `picture` 태그를 활용해야 한다.
+
+```tsx
+// ...
+const MyComponents = () => {
+  return (
+    <picture>
+      <source
+        className={styles.heroImage}
+        type="image/webp"
+        srcSet={heroImageWebp}
+      />
+      <img className={styles.heroImage} src={heroImage} alt="hero image" />
+    </picture>
+  );
+  // ...
+};
+```
+
+`webp`를 지원하는 브라우저인 경우 `webp`이미지를 보여주고 그렇지 않은 브라우저인 경우엔 `jpg`이미지를 보여준다. 다음이 webp를 적용한 결과이다.
+
+<img src="/assets/images/performance/set-hero-webp.png">
+
+또한 다음과 같이 화면 너비에 따라 크기가 다른 이미지를 각각 불러올 수도 있다.
+
+```tsx
+const MyComponents = () => {
+  return (
+    <picture>
+      <source
+        src={heroImage}
+        className={styles.heroImage}
+        type="image/webp"
+        srcSet={`${heroImageSmallWebp} 700w, ${heroImageLargeWebp} 2000w`}
+      />
+      <img className={styles.heroImage} src={heroImage}></img>
+    </picture>
+  );
+  // ...
+};
+```
+
+## 2-5. 결론 및 최종 결과
+
+이미지 최적화를 하기 위해 코드적으로 많은 부분을 수정했기 보다는 이미지 포멧, 형식을 바꾸어 이미지의 크기(용량)자체를 줄였다. 지금까지 거쳐온 과정과 이에 따른 결과를 표로 나타내면 다음과 같다.
+
+|      기준      | 이미즈 크기 |
+| :------------: | :---------: |
+|      원본      |   10.7MB    |
+| 해상도 낮춘 후 |    2.4MB    |
+| format 변경 후 |    219kM    |
+| webp로 변경 후 |    109kM    |
+
+이미 해상도 변경, format 변경을 가능하게 해주는 사이트는 검색만 해도 많이 있다. 때문에 어렵지 않았고 webp도 사이트에서 변경을 할 수 있지만 [명령줄을 사용하여 WebP 이미지 만들기](https://web.dev/codelab-serve-images-webp/) 에서 소개하는 `cwebp` 명령어를 사용하였다. `picture` 태그에 대한 설명도 함께 있어 큰 어려움이 없이 이미지 최적화를 마무리 할 수 있었다.
+
+다음은 `이미지 크기 줄이기` 작업을 진행한 커밋이다.
+
+<a href="https://github.com/nlom0218/new-perf-basecamp/commit/b3af11c4b4b8ee1bfcdd1199c22b223cc5f3b598" target="_blank">refactor: 2. 이미지 크기 줄이기</a>
+
+<br />
+
+# 3. 애니메이션 GIF를 비디오로 대체하기
+
+애니메이션 GIF는 용량이 크다. 때문에 mp4, webm과 같은 파일 형식의 비디오로 변환하여 페이지를 더 빠르게 로드한다면 성능은 더욱 좋아질 것이다.
+
+<img src="/assets/images/performance/before-gif-file.png">
+
+## 3-1. ffempeg 설치
+
+미션에서 애니메이션 GIF를 비디오(mp4, webm)으로 변환하기 위해 `ffempeg`명령어를 사용했다. `ffempeg`명령어를 사용하기 위해선 이를 설치해야 하는데, 설치부터 쉽지 않은 과정이었다. 설치만 매끄럽게 되었다면 훨씬 간편하고 빠르게 작업을 마무리 했었을 것이다.
+
+기본적인 설치 명령어는 다음과 같다.
+
+```bash
+$ brew install ffmpeg
+```
+
+하지만 이 과정에서 설치 오류가 뜬다면 최신 릴리즈 버전으로 설치를 해야 하는데, 이때에는 다음과 같은 명령어를 입력해야 한다.
+
+```bash
+$ brew install ffmpeg --HEAD
+```
+
+## 3-2. mp4 비디오로 변환하기
+
+우선 `mp4`로 변환을 해보자. `ffempeg`명령어를 사용하여 `gif`을 `mp4`로 변환하기 위해선 다음과 같이 명령어를 실행해야 한다.
+
+```bash
+$ ffmpeg -i {원본 gif파일 경로} -b:v 0 -crf 25 -f mp4 -vcodec libx264 -pix_fmt yuv420p {변환될 mp4 파일 경로}
+```
+
+위 명령어에서는 `libx264` 인코더를 사용하는데 이는 320x240픽셀과 같이 크기가 짝수인 파일에서만 작동한다. 때문에 `gif`의 크기가 홀수인 경우엔 다음과 같이 "crop=trunc(iw/2)*2:trunc(ih/2)*2"을 명령어에 추가해야 한다.
+
+```bash
+$ ffmpeg -i {원본 gif파일 경로} -vf "crop=trunc(iw/2)*2:trunc(ih/2)*2" -b:v 0 -crf 25 -f mp4 -vcodec libx264 -pix_fmt yuv420p {변환될 mp4 파일 경로}
+```
+
+이를 바탕으로 실제 프로젝트에 사용해보자.
+
+```bash
+$ ffmpeg -i src/assets/images/find.gif -vf "crop=trunc(iw/2)*2:trunc(ih/2)*2" -b:v 0 -crf 25 -f mp4 -vcodec libx264 -pix_fmt yuv420p src/assets/images/find.mp4
+$ ffmpeg -i src/assets/images/free.gif -vf "crop=trunc(iw/2)*2:trunc(ih/2)*2" -b:v 0 -crf 25 -f mp4 -vcodec libx264 -pix_fmt yuv420p src/assets/images/free.mp4
+$ ffmpeg -i src/assets/images/trending.gif -vf "crop=trunc(iw/2)*2:trunc(ih/2)*2" -b:v 0 -crf 25 -f mp4 -vcodec libx264 -pix_fmt yuv420p src/assets/images/trending.mp4
+```
+
+성공적으로 변환된 것을 확인할 수 있다.
+
+<img src="/assets/images/performance/convert-mp4.png">
+
+다음 표는 `gif`와 `mp4`의 파일 크기를 비교한 것이다.
+
+| 이름\파일형식 |  gif  |  mp4  |
+| :-----------: | :---: | :---: |
+|     find      |  2MB  | 218kB |
+|     free      | 1.7MB | 126kB |
+|   trending    | 1.3MB | 111kB |
+
+## 3-3. webm 비디오로 변환하기
+
+이번에는 webm 비디오로 변화를 해보자. `mp4`는 1999년부터 사용되었지만 `webm`은 비교적 최근인 2010년에 출시된 새로운 파일 형식이다. `webm`이 `mp4`와 비교했을 때 파일 크기가 작지만 모든 브라우저가 지원을 하는 것이 아니므로 두개의 형식의 비디오를 모두 만들어 사용하는 것이 좋다.
+
+다음은 `ffempeg`명령어를 사용하여 `webm`으로 변환하는 명령어이다.
+
+```bash
+$ ffmpeg -i {원본 gif파일 경로} -c vp9 -b:v 0 -crf 41 {변환될 webm 파일 경로}
+```
+
+바로 프로젝트에 적용해보자.
+
+```bash
+$ ffmpeg -i src/assets/images/find.gif -c vp9 -b:v 0 -crf 41 src/assets/images/find.webm
+$ ffmpeg -i src/assets/images/free.gif -c vp9 -b:v 0 -crf 41 src/assets/images/trending.webm
+$ ffmpeg -i src/assets/images/trending.gif -c vp9 -b:v 0 -crf 41 src/assets/images/trending.webm
+```
+
+`webm`으로 성공적으로 변환되었고 `mp4`보다 더 작아진 파일 크기를 확인할 수 있다.
+
+<img src="/assets/images/performance/convert-webm.png">
+
+| 이름\파일형식 |  gif  |  mp4  | webm  |
+| :-----------: | :---: | :---: | :---: |
+|     find      |  2MB  | 218kB | 159kB |
+|     free      | 1.7MB | 126kB | 105kB |
+|   trending    | 1.3MB | 111kB | 84kB  |
+
+## 3-4. 코드에 적용하기
+
+다음은 `gif`파일을 바탕으로 렌더링을 하는 기존코드이다.
+
+```tsx
+const FeatureItem = ({ title, imageSrc }: FeatureItemProps) => {
+  return (
+    <div className={styles.featureItem}>
+      <img className={styles.featureImage} src={imageSrc} />
+      <div className={styles.featureTitleBg}></div>
+      <h4 className={styles.featureTitle}>{title}</h4>
+    </div>
+  );
+};
+```
+
+우선 `img`태그를 `video`태그로 바꾸어보자. 이때 `video`태그에는 다음과 같은 속성을 추가하여 `gif`처럼 보이게 할 수 있다.
+
+- autoPlay: 자동 재생
+- loop: 무한 반복
+- muted: 음소거
+- playsInline: 인라인으로 재생(전체 화면이 아닌)
+
+```tsx
+const FeatureItem = ({ title, imageSrc }: FeatureItemProps) => {
+  return (
+    <div className={styles.featureItem}>
+      <video className={styles.featureImage} autoPlay loop muted playsInline>
+        <h4 className={styles.featureTitle}>{title}</h4>
+      </video>
+    </div>
+  );
+};
+```
+
+다음 작업은 `source`태그를 통해 브라우저가 지원할 수 있는 비디오 파일을 추가한다. 먼저 `webm` 그 다음은 `mp4`이다.
+
+```tsx
+const FeatureItem = ({ title, webmSrc, mp4Src }: FeatureItemProps) => {
+  return (
+    <div className={styles.featureItem}>
+      <video className={styles.featureImage} autoPlay loop muted playsInline>
+        <source src={webmSrc} type="video/webm" />
+        <source src={mp4Src} type="video/mp4" />
+        <h4 className={styles.featureTitle}>{title}</h4>
+      </video>
+    </div>
+  );
+};
+```
+
+## 3-5. 결론 및 최종 결과
+
+성공적으로 `gif`을 `webm`으로 변환하여 파일 크기를 줄였다.
+
+<img src="/assets/images/performance/webm-size.png">
+
+`애니메이션 GIF를 비디오로 대체하기`작업을 위해 참고한 글이다.
+
+[애니메이션 GIF를 비디오로 대체하여 페이지를 더 빠르게 로드](https://web.dev/replace-gifs-with-videos/#create-mpeg-videos)
+
+다음은 `애니메이션 GIF를 비디오로 대체하기` 작업을 진행한 커밋이다.
+
+<a href="https://github.com/nlom0218/new-perf-basecamp/commit/fc5d6e797042dd8f291217cffd6c685fa1f6a89a" target="_blank">refactor: 3. 애니메이션 GIF를 비디오로 대체하기</a>
