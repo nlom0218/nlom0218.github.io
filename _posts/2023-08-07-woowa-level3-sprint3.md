@@ -5,7 +5,6 @@ categories:
   - 프로그래밍
 tags:
   - 우아한테크코스
-  - 우테코
 image:
   thumbnail: /assets/images/woowa-level3.jpeg
   path: /assets/images/woowa-level3.jpeg
